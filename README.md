@@ -1,7 +1,7 @@
-# ElysiaJS Route Visualizer
+# ElysiaJS VS Code Extension
 
-This VSCode extension helps you visualize routes in your [ElysiaJS](https://elysiajs.com/) backend applications.
-It statically analyzes your TypeScript code to extract routes and displays them in a dedicated tree view.
+This is the comprehensive VS Code extension for [ElysiaJS](https://elysiajs.com/) developers.
+Initially focusing on **Route Visualization**, it aims to provide a full suite of tools for ElysiaJS development.
 
 ## Features
 
@@ -36,10 +36,10 @@ Currently, this extension works out-of-the-box and does not require complex conf
 
 ---
 
-# ElysiaJS 라우트 시각화 도구 (Korean Version)
+# ElysiaJS VS Code 확장 프로그램 (Korean Version)
 
-이 VSCode 확장은 [ElysiaJS](https://elysiajs.com/) 백엔드 애플리케이션의 라우트를 시각적으로 확인할 수 있도록 도와줍니다.
-TypeScript 코드를 정적으로 분석하여 라우트를 추출하고, 전용 트리 뷰(Tree View)에 표시합니다.
+이것은 [ElysiaJS](https://elysiajs.com/) 개발자를 위한 종합 VS Code 확장 프로그램입니다.
+초기 버전은 **라우트 시각화**에 집중하고 있으며, 향후 ElysiaJS 개발을 위한 다양한 도구를 제공할 예정입니다.
 
 ## 주요 기능
 

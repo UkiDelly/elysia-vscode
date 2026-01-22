@@ -1,16 +1,18 @@
 {
-  "name": "elysia-route-visualizer",
-  "displayName": "ElysiaJS Route Visualizer",
-  "description": "Visualizes ElysiaJS routes in VSCode sidebar.",
+  "name": "elysia-vscode",
+  "displayName": "ElysiaJS",
+  "description": "Comprehensive VS Code extension for ElysiaJS Developers",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.80.0"
   },
+  "license": "MIT",
   "categories": [
     "Other"
   ],
   "activationEvents": [
-    "onLanguage:typescript"
+    "onLanguage:typescript",
+    "workspaceContains:package.json"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -26,8 +28,10 @@
     "views": {
       "elysia-routes-container": [
         {
+          "icon": "$(list-tree)",
           "id": "elysia-routes-view",
-          "name": "Routes"
+          "name": "Elysia Routes",
+          "when": "elysia:isElysiaProject"
         }
       ]
     }
