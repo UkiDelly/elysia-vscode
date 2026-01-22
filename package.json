@@ -1,8 +1,8 @@
 {
   "name": "elysia-vscode",
-  "displayName": "ElysiaJS",
+  "displayName": "ElysiaJS VSCode Extension",
   "description": "Comprehensive VS Code extension for ElysiaJS Developers",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "ukidelly",
   "repository": {
     "type": "git",
