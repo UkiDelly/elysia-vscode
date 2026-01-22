@@ -17,3 +17,4 @@ out/test/**
 CLAUDE.md
 GEMINI.md
 pnpm-lock.yaml
+.claude

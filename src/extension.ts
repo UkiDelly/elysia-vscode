@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { RouteTreeProvider } from './route-provider';
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
     console.log('ElysiaJS Route Visualizer is now active!');
 
     // Check if the current workspace checks specifically for 'elysia' dependency
@@ -30,12 +30,12 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.executeCommand('setContext', 'elysia:isElysiaProject', isElysiaProject);
     };
 
-    // Initial check
-    checkElysiaProject();
+    // Initial check - await를 추가하여 context 설정이 완료될 때까지 대기
+    await checkElysiaProject();
 
     const routeProvider = new RouteTreeProvider();
 
-    // Register the Tree View
+    // Register the Tree View - 이제 elysia:isElysiaProject context가 설정된 후 실행됨
     vscode.window.registerTreeDataProvider('elysia-routes-view', routeProvider);
 
     // Refresh on file save or active editor change

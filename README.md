@@ -28,11 +28,29 @@ Currently, this extension works out-of-the-box and does not require complex conf
 
 ## Release Notes
 
+### 0.0.4
+
+- **Critical Bug Fix**: Fixed TreeView not displaying in production builds
+- Resolved async timing issue in extension activation
+- Improved extension lifecycle management
+
+See [CHANGELOG.md](CHANGELOG.md) for detailed release history.
+
+### 0.0.3
+
+- Enhanced workspace scanning
+- Added automatic ElysiaJS project detection
+
+### 0.0.2
+
+- Added extension icon and .vscodeignore
+- Updated package.json dependencies
+
 ### 0.0.1
 
-- Initial release.
-- Static analysis of routes.
-- Support for groups and prefixes.
+- Initial release
+- Static analysis of routes
+- Support for groups and prefixes
 
 ---
 
@@ -65,6 +83,24 @@ Currently, this extension works out-of-the-box and does not require complex conf
 현재 이 확장은 별도의 복잡한 설정 없이 바로 사용할 수 있습니다.
 
 ## 릴리스 노트
+
+### 0.0.4
+
+- **중요 버그 수정**: 배포 버전에서 TreeView가 표시되지 않던 문제 해결
+- 확장 활성화 시 비동기 타이밍 이슈 수정
+- Extension 생명주기 관리 개선
+
+자세한 릴리스 내역은 [CHANGELOG.md](CHANGELOG.md)를 참조하세요.
+
+### 0.0.3
+
+- 워크스페이스 스캔 개선
+- ElysiaJS 프로젝트 자동 감지 기능 추가
+
+### 0.0.2
+
+- 확장 아이콘 및 .vscodeignore 추가
+- package.json 의존성 업데이트
 
 ### 0.0.1
 
