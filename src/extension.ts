@@ -1,11 +1,16 @@
 import * as vscode from 'vscode';
 import { RouteTreeProvider } from './route-provider';
+import { logger } from './logger';
 
 export async function activate(context: vscode.ExtensionContext) {
-    console.log('ElysiaJS Route Visualizer is now active!');
+    logger.log('🚀 ElysiaJS Route Visualizer is now active!');
+    
+    // 채널을 subscriptions에 추가하여 확장 프로그램 종료 시 자동 정리
+    context.subscriptions.push(logger.getDispose());
 
     // Check if the current workspace checks specifically for 'elysia' dependency
     const checkElysiaProject = async () => {
+        logger.log('Checking if this is an ElysiaJS project...');
         const packageJsonFiles = await vscode.workspace.findFiles('**/package.json', '**/node_modules/**');
 
         let isElysiaProject = false;
@@ -23,10 +28,11 @@ export async function activate(context: vscode.ExtensionContext) {
                     break;
                 }
             } catch (error) {
-                console.error(`Failed to parse package.json at ${file.fsPath}:`, error);
+                logger.error(`Failed to parse package.json at ${file.fsPath}`, error);
             }
         }
 
+        logger.log(`ElysiaJS project detection result: ${isElysiaProject}`);
         vscode.commands.executeCommand('setContext', 'elysia:isElysiaProject', isElysiaProject);
     };
 
@@ -38,17 +44,22 @@ export async function activate(context: vscode.ExtensionContext) {
     // Register the Tree View - 이제 elysia:isElysiaProject context가 설정된 후 실행됨
     vscode.window.registerTreeDataProvider('elysia-routes-view', routeProvider);
 
-    // Refresh on file save or active editor change
+    // Refresh only on file save
     context.subscriptions.push(
-        vscode.window.onDidChangeActiveTextEditor(() => routeProvider.refresh()),
-        vscode.workspace.onDidChangeTextDocument(e => {
-            if (vscode.window.activeTextEditor && e.document === vscode.window.activeTextEditor.document) {
+        vscode.workspace.onDidSaveTextDocument(document => {
+            if (document.languageId === 'typescript' || document.languageId === 'typescriptreact') {
+                logger.log(`Document saved: ${document.fileName}, refreshing routes...`);
                 routeProvider.refresh();
             }
         }),
         // Re-check on workspace folder changes
-        vscode.workspace.onDidChangeWorkspaceFolders(() => checkElysiaProject())
+        vscode.workspace.onDidChangeWorkspaceFolders(() => {
+            logger.log('Workspace folders changed, re-checking project type...');
+            checkElysiaProject();
+        })
     );
 }
 
-export function deactivate() {}
+export function deactivate() {
+    logger.log('ElysiaJS Route Visualizer is deactivating...');
+}

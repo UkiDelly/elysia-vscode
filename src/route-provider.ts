@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { parseRoutes, RouteItem } from './parser';
+import { logger } from './logger';
 
 class FileItem extends vscode.TreeItem {
     constructor(
@@ -45,6 +46,7 @@ export class RouteTreeProvider implements vscode.TreeDataProvider<FileItem | Rou
     readonly onDidChangeTreeData: vscode.Event<FileItem | RouteTreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
     refresh(): void {
+        logger.log('Refreshing Route Tree View...');
         this._onDidChangeTreeData.fire();
     }
 
@@ -62,7 +64,9 @@ export class RouteTreeProvider implements vscode.TreeDataProvider<FileItem | Rou
         }
 
         // Root: Find all TS files in workspace
+        logger.log('Scanning workspace for TypeScript files...');
         const uris = await vscode.workspace.findFiles('**/*.{ts,tsx}', '**/node_modules/**');
+        logger.log(`Found ${uris.length} TypeScript files.`);
         const fileItems: FileItem[] = [];
 
         for (const uri of uris) {
@@ -71,10 +75,12 @@ export class RouteTreeProvider implements vscode.TreeDataProvider<FileItem | Rou
                 const routes = parseRoutes(document.getText());
 
                 if (routes.length > 0) {
+                    logger.log(`Found ${routes.length} routes in ${uri.fsPath}`);
+                    routes.forEach(r => logger.log(`  - [${r.method}] ${r.path} (Line ${r.line})`));
                     fileItems.push(new FileItem(uri, routes));
                 }
             } catch (e) {
-                console.error(`Failed to parse ${uri.fsPath}`, e);
+                logger.error(`Failed to parse ${uri.fsPath}`, e);
             }
         }
 
