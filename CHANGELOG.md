@@ -5,11 +5,26 @@ All notable changes to the "elysia-vscode" extension will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.8] - 2026-01-23
+
+### 🇺🇸 English
+
+#### Added
+
+- **Support for .guard()**: Fixed an issue where routes defined inside `.guard()` blocks were not correctly inheriting the parent prefix.
+
+### 🇰🇷 Korean
+
+#### Added (추가)
+
+- **.guard() 지원**: `.guard()` 블록 내부에 정의된 라우트가 부모 프리픽스(Prefix)를 올바르게 상속하지 못하던 문제 해결
+
 ## [0.0.7] - 2026-01-23
 
 ### 🇺🇸 English
 
 #### Fixed
+
 - **Critical Build Fix**: Resolved `npm error missing` and build failures during packaging.
   - Optimized Webpack configuration and dependency structure.
 - **TreeView Fix**: Resolved "No registered data providers" error.
@@ -17,12 +32,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed view loading issues in production environments.
 
 #### Technical Details
+
 - Improved production build pipeline.
 - Refined `typescript` runtime dependency handling.
 
 ### 🇰🇷 Korean
 
 #### Fixed (수정)
+
 - **치명적 빌드 오류 수정**: 패키징 시 발생하던 `npm error missing` 및 빌드 오류 해결
   - Webpack 설정 최적화 및 의존성 구조 개선
 - **TreeView 수정**: "No registered data providers" 오류 수정
@@ -30,6 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 배포 환경에서의 뷰 로딩 문제 해결
 
 #### Technical Details (기술적 세부사항)
+
 - Production 빌드 파이프라인 개선
 - `typescript` 런타임 의존성 처리 방식 개선
 
@@ -99,12 +117,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History
 
+- **0.0.8**: Added support for `.guard()` route prefix inheritance
 - **0.0.7**: Build fixes & TreeView stabilization
 - **0.0.4**: Critical bug fix - TreeView 배포 버전 오류 해결
 - **0.0.3**: Workspace 스캔 개선 및 자동 감지
 - **0.0.2**: Extension 기본 설정 및 아이콘 추가
 - **0.0.1**: Initial release with route visualization
 
+[0.0.8]: https://github.com/UkiDelly/elysia-vscode/compare/v0.0.7...v0.0.8
 [0.0.7]: https://github.com/UkiDelly/elysia-vscode/compare/v0.0.4...v0.0.7
 [0.0.4]: https://github.com/UkiDelly/elysia-vscode/compare/v0.0.3...v0.0.4
 [0.0.3]: https://github.com/UkiDelly/elysia-vscode/compare/v0.0.2...v0.0.3

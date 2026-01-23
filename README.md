@@ -28,6 +28,10 @@ Currently, this extension works out-of-the-box and does not require complex conf
 
 ## Release Notes
 
+### 0.0.8
+
+- **Improved Route Parsing**: Added support for `.guard()` method to correctly inherit route prefixes for nested routes.
+
 ### 0.0.7
 
 - **Production Ready**: Fixed critical packaging and build errors

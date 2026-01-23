@@ -84,6 +84,22 @@ export function parseRoutes(code: string): RouteItem[] {
                     visit(node.arguments[i], prefix);
                 }
                 return; // Stop standard forEachChild
+            } else if (methodName === 'guard') {
+                const callback = node.arguments.find(arg =>
+                    ts.isArrowFunction(arg) || ts.isFunctionExpression(arg)
+                );
+
+                if (callback && (ts.isArrowFunction(callback) || ts.isFunctionExpression(callback))) {
+                    visit(callback.body, effectivePrefix);
+                }
+
+                visit(node.expression, prefix);
+                for (const arg of node.arguments) {
+                    if (arg !== callback) {
+                        visit(arg, prefix);
+                    }
+                }
+                return;
             } else if (HTTP_METHODS.includes(methodName)) {
                 // Ensure it has at least 2 arguments (path, handler) to avoid matching 'headers.get("key")'
                 // 'headers.get("key")'와 일치하지 않도록 최소 2개의 인수(path, handler)가 있는지 확인
