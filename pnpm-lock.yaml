@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      typescript:
+        specifier: ^5.1.3
+        version: 5.9.3
     devDependencies:
       '@types/mocha':
         specifier: ^10.0.1
@@ -23,9 +27,6 @@ importers:
       ts-loader:
         specifier: ^9.4.3
         version: 9.5.4(typescript@5.9.3)(webpack@5.104.1)
-      typescript:
-        specifier: ^5.1.3
-        version: 5.9.3
       webpack:
         specifier: ^5.85.0
         version: 5.104.1(webpack-cli@5.1.4)

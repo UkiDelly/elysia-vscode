@@ -2,7 +2,7 @@
   "name": "elysia-vscode",
   "displayName": "ElysiaJS VSCode Extension",
   "description": "Comprehensive VS Code extension for ElysiaJS Developers",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "publisher": "ukidelly",
   "repository": {
     "type": "git",
@@ -26,9 +26,11 @@
   ],
   "activationEvents": [
     "onLanguage:typescript",
-    "workspaceContains:package.json"
+    "workspaceContains:package.json",
+    "onView:elysia-routes-view",
+    "onCommand:elysia.refreshRoutes"
   ],
-  "main": "./out/extension.js",
+  "main": "./dist/extension.js",
   "contributes": {
     "viewsContainers": {
       "activitybar": [
@@ -47,12 +49,29 @@
           "name": "Elysia Routes"
         }
       ]
+    },
+    "commands": [
+      {
+        "command": "elysia.refreshRoutes",
+        "title": "Refresh Routes",
+        "icon": "$(refresh)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "elysia.refreshRoutes",
+          "when": "view == elysia-routes-view",
+          "group": "navigation"
+        }
+      ]
     }
   },
   "scripts": {
-    "vscode:prepublish": "pnpm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "pnpm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
     "pretest": "pnpm run compile && pnpm run lint",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js"
