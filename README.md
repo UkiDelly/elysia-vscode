@@ -28,6 +28,14 @@ Currently, this extension works out-of-the-box and does not require complex conf
 
 ## Release Notes
 
+### 0.0.7
+
+- **Production Ready**: Fixed critical packaging and build errors
+- **Stabilization**: Resolved "No registered data providers" TreeView error
+- Improved extension activation reliability
+
+See [CHANGELOG.md](CHANGELOG.md) for detailed release history.
+
 ### 0.0.4
 
 - **Critical Bug Fix**: Fixed TreeView not displaying in production builds
@@ -83,6 +91,14 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed release history.
 현재 이 확장은 별도의 복잡한 설정 없이 바로 사용할 수 있습니다.
 
 ## 릴리스 노트
+
+### 0.0.7
+
+- **배포 안정화**: 패키징 및 빌드 관련 중요 오류 수정
+- **안정성 개선**: "No registered data providers" TreeView 오류 해결
+- 확장 프로그램 활성화 및 초기화 로직 개선
+
+자세한 릴리스 내역은 [CHANGELOG.md](CHANGELOG.md)를 참조하세요.
 
 ### 0.0.4
 

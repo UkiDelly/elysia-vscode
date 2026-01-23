@@ -5,9 +5,38 @@ All notable changes to the "elysia-vscode" extension will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.7] - 2026-01-23
+
+### 🇺🇸 English
+
+#### Fixed
+- **Critical Build Fix**: Resolved `npm error missing` and build failures during packaging.
+  - Optimized Webpack configuration and dependency structure.
+- **TreeView Fix**: Resolved "No registered data providers" error.
+  - Stabilized `TreeDataProvider` registration timing and activation logic.
+  - Fixed view loading issues in production environments.
+
+#### Technical Details
+- Improved production build pipeline.
+- Refined `typescript` runtime dependency handling.
+
+### 🇰🇷 Korean
+
+#### Fixed (수정)
+- **치명적 빌드 오류 수정**: 패키징 시 발생하던 `npm error missing` 및 빌드 오류 해결
+  - Webpack 설정 최적화 및 의존성 구조 개선
+- **TreeView 수정**: "No registered data providers" 오류 수정
+  - `TreeDataProvider` 등록 타이밍 및 activate 로직 안정화
+  - 배포 환경에서의 뷰 로딩 문제 해결
+
+#### Technical Details (기술적 세부사항)
+- Production 빌드 파이프라인 개선
+- `typescript` 런타임 의존성 처리 방식 개선
+
 ## [0.0.4] - 2026-01-22
 
 ### Fixed
+
 - **Critical**: 배포 버전에서 TreeView가 표시되지 않던 문제 수정
   - `activate()` 함수를 async로 변경하여 비동기 타이밍 이슈 해결
   - `checkElysiaProject()` 완료 전에 TreeView가 등록되던 문제 해결
@@ -17,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - "보기 데이터를 제공할 수 있는 등록된 데이터 공급자가 없습니다" 오류 해결
 
 ### Technical Details
+
 - Extension activation이 이제 완전히 비동기로 처리됨
 - TreeView 등록 전 workspace 스캔 완료 보장
 - VSCode Extension API의 `Thenable<void>` 패턴 준수
@@ -24,25 +54,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.3] - 2026-01-22
 
 ### Added
+
 - Workspace 스캔 개선
 - ElysiaJS 프로젝트 자동 감지 로직 추가
 
 ### Changed
+
 - Activity Bar에 전용 아이콘 추가
 - TreeView UX 개선
 
 ## [0.0.2] - 2026-01-22
 
 ### Added
+
 - VSCode Extension 기본 설정 완료
 - 아이콘 및 .vscodeignore 추가
 
 ### Changed
+
 - package.json 의존성 및 설정 업데이트
 
 ## [0.0.1] - 2026-01-22
 
 ### Added
+
 - 🎉 Initial release
 - ElysiaJS 라우트 정적 분석 기능
   - `.get()`, `.post()`, `.put()`, `.delete()`, `.patch()` 등 HTTP 메서드 감지
@@ -55,6 +90,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 파일 저장 및 에디터 변경 시 자동 새로고침
 
 ### Technical Implementation
+
 - TypeScript Compiler API를 사용한 AST 기반 정적 분석
 - False positive 방지 (예: `headers.get()` 제외)
 - Prefix 누적(accumulation) 알고리즘으로 전체 경로 계산
@@ -63,11 +99,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History
 
+- **0.0.7**: Build fixes & TreeView stabilization
 - **0.0.4**: Critical bug fix - TreeView 배포 버전 오류 해결
 - **0.0.3**: Workspace 스캔 개선 및 자동 감지
 - **0.0.2**: Extension 기본 설정 및 아이콘 추가
 - **0.0.1**: Initial release with route visualization
 
+[0.0.7]: https://github.com/UkiDelly/elysia-vscode/compare/v0.0.4...v0.0.7
 [0.0.4]: https://github.com/UkiDelly/elysia-vscode/compare/v0.0.3...v0.0.4
 [0.0.3]: https://github.com/UkiDelly/elysia-vscode/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/UkiDelly/elysia-vscode/compare/v0.0.1...v0.0.2
