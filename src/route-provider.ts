@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { logger } from './logger';
-import { ParsedData, parseRoutes, RouteItem } from './parser';
+import { joinPaths, ParsedData, parseRoutes, RouteItem } from './parser';
 
 interface ResolvedRouteItem extends RouteItem {
     sourceFile?: string;
@@ -117,7 +117,7 @@ export class RouteTreeProvider implements vscode.TreeDataProvider<FileItem | Rou
                                 // Add new composed route
                                 combinedRoutes.push({
                                     method: r.method,
-                                    path: usage.prefix + r.path,
+                                    path: joinPaths(usage.prefix, r.path),
                                     line: r.line, // Keep original line
                                     sourceFile: otherPath // Navigation Target
                                 });
@@ -144,9 +144,10 @@ export class RouteTreeProvider implements vscode.TreeDataProvider<FileItem | Rou
 
                             consumedRoutes.add(getSig(r));
 
+
                             combinedRoutes.push({
                                 method: r.method,
-                                path: usage.prefix + r.path,
+                                path: joinPaths(usage.prefix, r.path),
                                 line: r.line,
                                 sourceFile: fsPath
                             });

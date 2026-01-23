@@ -5,6 +5,24 @@ All notable changes to the "elysia-vscode" extension will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.10] - 2026-01-23
+
+### 🇺🇸 English
+
+#### Fixed
+
+- **Route Path Normalization**: Fixed an issue where routes without a leading slash (e.g., `.get('info')`) were displayed incorrectly.
+- **Empty Path Handling**: Fixed an issue where empty route paths (e.g., `.get('')`) were generating unwanted trailing slashes. All paths are now correctly normalized and joined.
+- **Parser Robustness**: Improved `parser.ts` with `normalizePath` and `joinPaths` helpers for safer AST traversal.
+
+### 🇰🇷 Korean
+
+#### Fixed (수정)
+
+- **라우트 경로 정규화**: 슬래시 없이 정의된 라우트(예: `.get('info')`)가 View에서 올바르게 표시되지 않던 문제 수정
+- **빈 경로 처리 개선**: 빈 문자열 경로(`.get('')`) 사용 시 불필요한 Trailing Slash가 붙던 문제 해결
+- **Parser 안정성 강화**: `normalizePath` 및 `joinPaths` 헬퍼 도입으로 경로 결합 로직의 안정성 개선
+
 ## [0.0.9] - 2026-01-23
 
 ### 🇺🇸 English

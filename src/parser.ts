@@ -20,7 +20,46 @@ export interface ParsedData {
     imports: Record<string, string>;
 }
 
+
 const HTTP_METHODS = ['get', 'post', 'put', 'delete', 'patch', 'head', 'options'];
+
+
+
+function normalizePath(path: string): string {
+    if (!path) return '';
+    if (!path.startsWith('/')) {
+        return '/' + path;
+    }
+    return path;
+}
+
+export function joinPaths(prefix: string, path: string): string {
+    const normalizedPrefix = normalizePath(prefix);
+    const normalizedPath = normalizePath(path);
+
+    // If we have a prefix but no path (e.g. group('/api') -> get('')), return prefix.
+    // Ensure we handle root prefix '/' correctly (return '/')
+    if (!normalizedPath) {
+        if (!normalizedPrefix) return '/';
+        // Strip trailing slash from prefix if it exists and prefix is not just root
+        if (normalizedPrefix.endsWith('/') && normalizedPrefix.length > 1) {
+            return normalizedPrefix.slice(0, -1);
+        }
+        return normalizedPrefix;
+    }
+
+    // If we have path but no prefix (e.g. get('/info')), return path
+    if (!normalizedPrefix || normalizedPrefix === '/') {
+        return normalizedPath || '/';
+    }
+
+    // Both exist
+    const cleanPrefix = normalizedPrefix.endsWith('/') && normalizedPrefix.length > 1
+        ? normalizedPrefix.slice(0, -1)
+        : normalizedPrefix;
+
+    return cleanPrefix + normalizedPath;
+}
 
 // Helper to find 'prefix' in 'new Elysia({ prefix: "..." })'
 function getElysiaInstancePrefix(node: ts.CallExpression): string {
@@ -48,7 +87,7 @@ function getElysiaInstancePrefix(node: ts.CallExpression): string {
 
                 if (prefixProp && ts.isPropertyAssignment(prefixProp)) {
                     if (ts.isStringLiteral(prefixProp.initializer)) {
-                        return prefixProp.initializer.text;
+                        return normalizePath(prefixProp.initializer.text);
                     }
                 }
             }
@@ -145,7 +184,7 @@ export function parseRoutes(code: string): ParsedData {
                 const pathArg = node.arguments[0];
                 const callback = node.arguments[1];
                 if (pathArg && ts.isStringLiteral(pathArg)) {
-                    const newPrefix = effectivePrefix + pathArg.text;
+                    const newPrefix = joinPaths(effectivePrefix, pathArg.text);
                     if (callback && (ts.isArrowFunction(callback) || ts.isFunctionExpression(callback))) {
                         visit(callback.body, newPrefix);
                     }
@@ -180,7 +219,7 @@ export function parseRoutes(code: string): ParsedData {
                 if (node.arguments.length >= 2) {
                     const pathArg = node.arguments[0];
                     if (pathArg && ts.isStringLiteral(pathArg)) {
-                        const fullPath = effectivePrefix + pathArg.text;
+                        const fullPath = joinPaths(effectivePrefix, pathArg.text);
                         const { line } = sourceFile.getLineAndCharacterOfPosition(node.expression.name.getStart());
 
                         const route = {
