@@ -28,6 +28,12 @@ Currently, this extension works out-of-the-box and does not require complex conf
 
 ## Release Notes
 
+### 0.0.9
+
+- **Nested Routes Support**: Correctly displays routes imported via `.use()`, inheriting parent prefixes.
+- **Route Deduplication**: Helper routes (modules) that are fully consumed by other routes are now hidden from the top-level view to reduce clutter.
+- **Go to Definition**: Clicking on a nested route now takes you to the _original definition file_ instead of the usage location.
+
 ### 0.0.8
 
 - **Improved Route Parsing**: Added support for `.guard()` method to correctly inherit route prefixes for nested routes.

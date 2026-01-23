@@ -5,6 +5,24 @@ All notable changes to the "elysia-vscode" extension will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.9] - 2026-01-23
+
+### 🇺🇸 English
+
+#### Added
+
+- **Nested Routes Support**: Added ability to resolve routes imported via `.use()`.
+- **Navigation to Definition**: Clicking a nested route now opens the original definition file.
+- **Route Deduplication**: Helper routes that are consumed by other files are hidden from the top-level view.
+
+### 🇰🇷 Korean
+
+#### Added (추가)
+
+- **중첩 라우트 지원**: `.use()`를 통해 가져온 라우트가 부모 프리픽스를 상속받아 표시되도록 개선
+- **정의 위치로 이동**: 중첩된 라우트 클릭 시, 실제 코드가 정의된 원본 파일로 이동하는 기능 추가
+- **라우트 중복 제거**: 다른 파일에서 사용된 헬퍼 라우트 모듈이 최상위 뷰에 중복 노출되지 않도록 개선
+
 ## [0.0.8] - 2026-01-23
 
 ### 🇺🇸 English
