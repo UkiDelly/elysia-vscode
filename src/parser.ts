@@ -4,6 +4,7 @@ export interface RouteItem {
     method: string;
     path: string;
     line: number;
+    parentVar?: string; // The variable this route belongs to
 }
 
 export interface ParsedData {
@@ -15,6 +16,7 @@ export interface ParsedData {
         variable: string;
         prefix: string;
         line: number;
+        parentVar?: string; // The variable this usage belongs to
     }[];
     // Map of local variable names to imported original names (e.g. { AdminModules: 'AdminModules' })
     imports: Record<string, string>;
@@ -111,7 +113,7 @@ export function parseRoutes(code: string): ParsedData {
     // Better: 'routes' contains all inline defined routes.
 
     const exports: Record<string, RouteItem[]> = {};
-    const usages: { variable: string; prefix: string; line: number; }[] = [];
+    const usages: { variable: string; prefix: string; line: number; parentVar?: string; }[] = [];
     const imports: Record<string, string> = {};
 
     // 1. Parse Imports
@@ -208,11 +210,23 @@ export function parseRoutes(code: string): ParsedData {
                 // .use(adminRoutes)
                 const useArg = node.arguments[0];
                 if (useArg && ts.isIdentifier(useArg)) {
+                    // Find parent var
+                    let parentVar: string | undefined;
+                    let current: ts.Node = node;
+                    while (current.parent) {
+                        if (ts.isVariableDeclaration(current.parent) && ts.isIdentifier(current.parent.name)) {
+                            parentVar = current.parent.name.text;
+                            break;
+                        }
+                        current = current.parent;
+                    }
+
                     // It's a variable usage!
                     usages.push({
                         variable: useArg.text,
                         prefix: effectivePrefix,
-                        line: sourceFile.getLineAndCharacterOfPosition(useArg.getStart()).line + 1
+                        line: sourceFile.getLineAndCharacterOfPosition(useArg.getStart()).line + 1,
+                        parentVar
                     });
                 }
             } else if (HTTP_METHODS.includes(methodName)) {
@@ -222,7 +236,7 @@ export function parseRoutes(code: string): ParsedData {
                         const fullPath = joinPaths(effectivePrefix, pathArg.text);
                         const { line } = sourceFile.getLineAndCharacterOfPosition(node.expression.name.getStart());
 
-                        const route = {
+                        const route: RouteItem = {
                             method: methodName.toUpperCase(),
                             path: fullPath,
                             line: line + 1,
@@ -234,6 +248,7 @@ export function parseRoutes(code: string): ParsedData {
                         while (current.parent) {
                             if (ts.isVariableDeclaration(current.parent) && ts.isIdentifier(current.parent.name)) {
                                 const varName = current.parent.name.text;
+                                route.parentVar = varName;
                                 if (exportedVariables.has(varName)) {
                                     if (!exports[varName]) exports[varName] = [];
                                     exports[varName].push(route);

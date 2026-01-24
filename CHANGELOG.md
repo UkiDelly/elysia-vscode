@@ -5,6 +5,20 @@ All notable changes to the "elysia-vscode" extension will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-01-24
+
+### 🇺🇸 English
+
+#### Fixed
+
+- **Parser Type Safety**: Resolved a TypeScript type mismatch error in `parser.ts` where `parentVar` was missing from the `usages` array definition.
+
+### 🇰🇷 Korean
+
+#### Fixed (수정)
+
+- **Parser 타입 안정성**: `parser.ts`의 `usages` 배열 정의에서 `parentVar` 속성이 누락되어 발생하던 TypeScript 타입 불일치 오류 수정
+
 ## [0.0.10] - 2026-01-23
 
 ### 🇺🇸 English

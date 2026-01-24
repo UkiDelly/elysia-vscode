@@ -4,6 +4,7 @@ import { joinPaths, ParsedData, parseRoutes, RouteItem } from './parser';
 
 interface ResolvedRouteItem extends RouteItem {
     sourceFile?: string;
+    isRaw?: boolean;
 }
 
 
@@ -81,7 +82,6 @@ export class RouteTreeProvider implements vscode.TreeDataProvider<FileItem | Rou
         logger.log(`Found ${uris.length} TypeScript files.`);
 
         const parsedFiles = new Map<string, ParsedData>();
-        const fileRouteItems: FileItem[] = [];
 
         await Promise.all(uris.map(async (uri) => {
             try {
@@ -93,93 +93,171 @@ export class RouteTreeProvider implements vscode.TreeDataProvider<FileItem | Rou
             }
         }));
 
-        const resolvedFileRoutes = new Map<string, ResolvedRouteItem[]>();
+        // --- NEW LOGIC: Prefix Propagation (Bottom-Up) ---
 
-        const consumedRoutes = new Set<string>(); // Tracks distinct path signatures (method:path) found as imports
+        // Map<UniqueModuleKey, Set<Prefix>>
+        // Key: "FilePath" (since we want all routes in a file to potentially inherit prefixes if they belong to exported vars)
+        // Wait, routes belong to specific variables.
+        // Key: "FilePath::VariableName"
+        const modulePrefixes = new Map<string, Set<string>>();
 
-        // Helper to produce signature
-        const getSig = (r: RouteItem) => `${r.method}:${r.path}`;
+        const getModuleKey = (filePath: string, varName: string) => `${filePath}::${varName}`;
+
+        // 1. Initialize all exported variables with empty prefix (as a baseline)
+        // Actually, we only care about tracking prefixes. If n/a, it's root.
+
+        // 2. Build Usage Graph
+        // We need to know: Who uses Whom? 
+        // Iterate all usages in all files.
+
+        interface UsageEdge {
+            fromFile: string;
+            fromVar?: string; // The variable in Parent that uses Child
+            toFile: string;
+            toVar: string; // The variable in Child being used
+            prefix: string; // The prefix applied at this usage
+        }
+
+        const edges: UsageEdge[] = [];
 
         for (const [fsPath, data] of parsedFiles.entries()) {
-            const combinedRoutes: ResolvedRouteItem[] = data.routes.map(r => ({ ...r, sourceFile: fsPath }));
-
             for (const usage of data.usages) {
-                const importedOriginalName = data.imports[usage.variable];
-                if (importedOriginalName) {
+                // Resolve the usage variable to a file/export
+                // Check imports
+                const originalName = data.imports[usage.variable];
+                if (originalName) {
+                    // Imported. Find which file exports this.
+                    // This is O(N) search unless we built an index. N is small (files).
                     for (const [otherPath, otherData] of parsedFiles.entries()) {
                         if (otherPath === fsPath) continue;
-                        if (otherData.exports[importedOriginalName]) {
-                            const importedRoutes = otherData.exports[importedOriginalName];
-                            importedRoutes.forEach(r => {
-                                // Mark source route as consumed
-                                consumedRoutes.add(getSig(r));
-
-                                // Add new composed route
-                                combinedRoutes.push({
-                                    method: r.method,
-                                    path: joinPaths(usage.prefix, r.path),
-                                    line: r.line, // Keep original line
-                                    sourceFile: otherPath // Navigation Target
-                                });
+                        if (otherData.exports[originalName]) {
+                            // Found the definition!
+                            edges.push({
+                                fromFile: fsPath,
+                                fromVar: usage.parentVar, // tracked in parser.ts
+                                toFile: otherPath,
+                                toVar: originalName,
+                                prefix: usage.prefix
                             });
                         }
                     }
                 } else {
-                    if (data.exports[usage.variable]) {
-                        const localRoutes = data.exports[usage.variable];
-                        localRoutes.forEach(r => {
-                            // Local usage also "consumes" the definition if we consider 
-                            // we only want to show the specific mounted endpoint? 
-                            // Usually local definitions are fine to show if they are top level.
-                            // But if 'adminRoutes' is just an object and never mounted globally except via .use,
-                            // then hiding it from top level 'routes' list (if it appeared there) makes sense.
-                            // However, 'routes' in Parser filters for HTTP calls on ANY variable.
-                            // Checks needed: does ParsedData.routes include routes from ALL variables? YES.
-                            // So if we have `const a = new Elysia().get('/a')`, it is in `routes`.
-                            // If we have `new Elysia().use(a)`, we get `/a` again.
-                            // So YES, we should mark local chunks as consumed too if fully used?
-
-                            // Let's mimic import logic:
-                            // Mark definitions as consumed.
-
-                            consumedRoutes.add(getSig(r));
-
-
-                            combinedRoutes.push({
-                                method: r.method,
-                                path: joinPaths(usage.prefix, r.path),
-                                line: r.line,
-                                sourceFile: fsPath
-                            });
+                    // Local usage? 
+                    // e.g. const auth = ...; const app = ... .use(auth);
+                    // It's in the same file.
+                    if (data.exports[usage.variable] || data.routes.some(r => r.parentVar === usage.variable)) {
+                        // It's a valid target in same file
+                        edges.push({
+                            fromFile: fsPath,
+                            fromVar: usage.parentVar,
+                            toFile: fsPath,
+                            toVar: usage.variable,
+                            prefix: usage.prefix
                         });
                     }
                 }
             }
-            resolvedFileRoutes.set(fsPath, combinedRoutes);
         }
 
-        // Finalize items and filter consumed
-        for (const [fsPath, routes] of resolvedFileRoutes.entries()) {
-            // Filter out consumed routes from THIS file's listing.
-            // CAREFUL: We only want to filter out "raw" routes that were tracked as consumed.
-            // But 'routes' here contains BOTH raw routes from parser AND resolved composed routes from above loop.
-            // We should filter ONLY if the route matches a known consumed signature AND it came from the original definition?
-            // Actually, we can just filter by signature.
-            // If we imported '/admins' to make '/cms/admins', we marked 'GET:/admins' as consumed.
-            // The new route is 'GET:/cms/admins'. It won't match.
-            // The original route 'GET:/admins' (in some file) WILL match.
-            // So filtering by signature works.
+        // 3. Propagate Prefixes
+        // We start with "Root" prefixes. 
+        // Roots are usages that have NO incoming edges? 
+        // No. "Roots" are usually the top-level apps (index.ts).
+        // But we want to show ALL routes.
+        // If a route is used, it inherits the parent's prefix.
+        // If a route is NOT used, it is at root '/' (of its own file).
+        // BUT, if it IS used, we usually ONLY want to show the used version (effective path).
+        // However, user logic: "Registered in parent -> Parent's prefix added to child".
 
-            const filteredRoutes = routes.filter(r => !consumedRoutes.has(getSig(r)));
+        // We need to calculate the "Effective Prefixes" for every Module (File::Var).
+        // A module can have multiple effective prefixes if used in multiple places.
 
-            if (filteredRoutes.length > 0) {
-                const uniqueRoutes = filteredRoutes.filter((v, i, a) =>
+        // Let's settle: 
+        // Init every module with [''] (Root) ?
+        // If we do that, we get duplicates (Root version + Mounted version).
+        // User wants: "Show in defining file". "Inherit prefix".
+        // Implies: If mounted, show mounted path. If not mounted, show raw path?
+        // Or always show relative path? No, "route view에는 제일 하위 라우들이 보여야해... 상위 라우트의 prefix가 하위 라우트 앞에 등록하는 식으로"
+        // This implies FULL PATHS.
+
+        // If I have `auth` (POST /login) used in `user` (/user), used in `app` (/api).
+        // `auth.ts` should show `POST /api/user/login`.
+        // It should NOT show `POST /login` (raw).
+
+        // So: If a module has incoming edges, we use those.
+        // If a module has NO incoming edges, we use [''] (Root).
+
+        // We need a recursive resolver with cycle detection.
+
+        const resolvedPrefixes = new Map<string, Set<string>>(); // Key: ModuleKey
+
+        const resolvePrefixes = (file: string, varName: string, stack: string[] = []): Set<string> => {
+            const key = getModuleKey(file, varName);
+            if (resolvedPrefixes.has(key)) return resolvedPrefixes.get(key)!;
+            if (stack.includes(key)) return new Set(['']); // Cycle break
+
+            const incoming = edges.filter(e => e.toFile === file && e.toVar === varName);
+
+            const results = new Set<string>();
+
+            if (incoming.length === 0) {
+                // No usages? It's a root module (or unused).
+                results.add('');
+            } else {
+                for (const edge of incoming) {
+                    // Get parent's prefixes
+                    let parentPrefixes: Set<string>;
+                    if (edge.fromVar) {
+                        parentPrefixes = resolvePrefixes(edge.fromFile, edge.fromVar, [...stack, key]);
+                    } else {
+                        // Usage from a top-level expression (not inside a variable)
+                        // Treat as Root
+                        parentPrefixes = new Set(['']);
+                    }
+
+                    for (const pp of parentPrefixes) {
+                        results.add(joinPaths(pp, edge.prefix)); // parser.ts export
+                    }
+                }
+            }
+
+            resolvedPrefixes.set(key, results);
+            return results;
+        };
+
+        // 4. Assign Final Routes to Files
+        const fileRouteItems: FileItem[] = [];
+
+        for (const [fsPath, data] of parsedFiles.entries()) {
+            const finalRoutes: RouteItem[] = [];
+
+            // Iterate all routes in this file
+            for (const route of data.routes) {
+                if (route.parentVar) {
+                    // This route belongs to a variable. Resolve prefixes for that variable.
+                    const prefixes = resolvePrefixes(fsPath, route.parentVar, []);
+                    for (const prefix of prefixes) {
+                        finalRoutes.push({
+                            ...route,
+                            path: joinPaths(prefix, route.path)
+                        });
+                    }
+                } else {
+                    // Orphan route (e.g. top level .get()). 
+                    // Has no parent variable, so it's not "used" by others via .use().
+                    // Unless we track "File Usage"? No, Elysia uses objects.
+                    // Treat as root.
+                    finalRoutes.push(route);
+                }
+            }
+
+            if (finalRoutes.length > 0) {
+                // Deduplicate (signatures)
+                const unique = finalRoutes.filter((v, i, a) =>
                     a.findIndex(t => t.method === v.method && t.path === v.path) === i
                 );
 
-                if (uniqueRoutes.length > 0) {
-                    fileRouteItems.push(new FileItem(vscode.Uri.file(fsPath), uniqueRoutes));
-                }
+                fileRouteItems.push(new FileItem(vscode.Uri.file(fsPath), unique));
             }
         }
 
