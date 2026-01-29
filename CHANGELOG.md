@@ -5,6 +5,22 @@ All notable changes to the "elysia-vscode" extension will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2026-01-30
+
+### 🇺🇸 English
+
+#### Performance
+
+- **Smart Caching**: Implemented mtime-based caching for cached files. The parser now skips re-parsing files that haven't changed, significantly improving refresh performance on large projects.
+- **Tree View Optimization**: Cached tree nodes are reused when possible to prevent flickering and reduce load.
+
+### 🇰🇷 Korean
+
+#### Performance (성능)
+
+- **스마트 캐싱**: 파일 수정 시간(mtime) 기반의 캐싱 로직 구현. 변경되지 않은 파일은 재파싱하지 않도록 최적화하여 대형 프로젝트에서의 새로고침 성능을 대폭 개선했습니다.
+- **트리 뷰 최적화**: 가능한 경우 캐시된 트리 노드를 재사용하여 깜빡임을 방지하고 부하를 줄였습니다.
+
 ## [0.1.1] - 2026-01-24
 
 ### 🇺🇸 English

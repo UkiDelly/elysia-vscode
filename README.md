@@ -28,6 +28,21 @@ Currently, this extension works out-of-the-box and does not require complex conf
 
 ## Release Notes
 
+### 0.1.2
+
+- **Performance Optimization**: Implemented smart caching for route parsing. Files are only re-parsed when modified.
+- **Improved UX**: Non-blocking background refresh for smoother experience.
+
+### 0.1.1
+
+- **Type Safety**: Fixed parser type definitions to prevent runtime errors.
+- **Stability**: Enhanced error handling during AST traversal.
+
+### 0.1.0
+
+- **Path Normalization**: Fixed issues with empty paths and trailing slashes.
+- **Robust Parsing**: improved handling of edge cases in route definitions.
+
 ### 0.0.9
 
 - **Nested Routes Support**: Correctly displays routes imported via `.use()`, inheriting parent prefixes.
@@ -101,6 +116,22 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed release history.
 현재 이 확장은 별도의 복잡한 설정 없이 바로 사용할 수 있습니다.
 
 ## 릴리스 노트
+
+### 0.1.1
+
+- **타입 안정성 (Type Safety)**: 런타임 오류 방지를 위한 파서 타입 정의 수정
+- **안정성 (Stability)**: AST 탐색 중 에러 처리 강화
+
+### 0.1.0
+
+- **경로 정규화 (Path Normalization)**: 빈 경로 및 후행 슬래시(Trailing Slash) 처리 문제 수정
+- **파싱 강화**: 다양한 라우트 정의 패턴에 대한 처리 개선
+
+### 0.0.9
+
+- **중첩 라우트 지원**: `.use()`를 통해 가져온 라우트가 부모 프리픽스를 상속받아 표시되도록 개선
+- **라우트 중복 제거**: 다른 파일에서 사용된 헬퍼 라우트 모듈이 최상위 뷰에 중복 노출되지 않도록 개선
+- **정의 위치로 이동**: 중첩된 라우트 클릭 시, 실제 코드가 정의된 원본 파일로 이동하는 기능 추가
 
 ### 0.0.7
 

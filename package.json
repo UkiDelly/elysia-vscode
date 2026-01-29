@@ -2,7 +2,7 @@
   "name": "elysia-vscode",
   "displayName": "ElysiaJS VSCode Extension",
   "description": "Comprehensive VS Code extension for ElysiaJS Developers",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publisher": "ukidelly",
   "repository": {
     "type": "git",
@@ -81,6 +81,8 @@
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.0.0",
     "@types/vscode": "^1.80.0",
+    "@typescript-eslint/eslint-plugin": "^8.54.0",
+    "@typescript-eslint/parser": "^8.54.0",
     "@vscode/vsce": "^3.7.1",
     "eslint": "^8.41.0",
     "ovsx": "^0.10.8",

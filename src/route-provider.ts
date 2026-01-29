@@ -1,3 +1,4 @@
+import { TextDecoder } from 'util';
 import * as vscode from 'vscode';
 import { logger } from './logger';
 import { joinPaths, ParsedData, parseRoutes, RouteItem } from './parser';
@@ -52,6 +53,7 @@ export class RouteTreeProvider implements vscode.TreeDataProvider<FileItem | Rou
     readonly onDidChangeTreeData: vscode.Event<FileItem | RouteTreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
     private _cachedNodes: FileItem[] | undefined = undefined;
+    private _parsedCache = new Map<string, { mtime: number, data: ParsedData; }>();
 
     refresh(): void {
         logger.log('Refreshing Route Tree View...');
@@ -85,9 +87,22 @@ export class RouteTreeProvider implements vscode.TreeDataProvider<FileItem | Rou
 
         await Promise.all(uris.map(async (uri) => {
             try {
-                const document = await vscode.workspace.openTextDocument(uri);
-                const data = parseRoutes(document.getText());
-                parsedFiles.set(uri.fsPath, data);
+                const stat = await vscode.workspace.fs.stat(uri);
+                const mtime = stat.mtime;
+                const fsPath = uri.fsPath;
+
+                const cached = this._parsedCache.get(fsPath);
+                if (cached && cached.mtime === mtime) {
+                    parsedFiles.set(fsPath, cached.data);
+                    return;
+                }
+
+                const content = await vscode.workspace.fs.readFile(uri);
+                const text = new TextDecoder().decode(content);
+                const data = parseRoutes(text);
+
+                this._parsedCache.set(fsPath, { mtime, data });
+                parsedFiles.set(fsPath, data);
             } catch (e) {
                 logger.error(`Failed to parse ${uri.fsPath}`, e);
             }
@@ -99,7 +114,7 @@ export class RouteTreeProvider implements vscode.TreeDataProvider<FileItem | Rou
         // Key: "FilePath" (since we want all routes in a file to potentially inherit prefixes if they belong to exported vars)
         // Wait, routes belong to specific variables.
         // Key: "FilePath::VariableName"
-        const modulePrefixes = new Map<string, Set<string>>();
+
 
         const getModuleKey = (filePath: string, varName: string) => `${filePath}::${varName}`;
 

@@ -21,7 +21,7 @@ interface ParsedData {
 
 // Logic Function (Copied/Adapted from route-provider.ts)
 function resolveRoutes(parsedFiles: Map<string, ParsedData>) {
-  const modulePrefixes = new Map<string, Set<string>>();
+
   const getModuleKey = (filePath: string, varName: string) => `${filePath}::${varName}`;
 
   interface UsageEdge {
